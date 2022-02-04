@@ -46,11 +46,10 @@
 			</exclusions>
 		</dependency>
 
-		<!--  MySQL Connector  -->
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<scope>runtime</scope>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>10.2.0.jre11</version>
 		</dependency>
 
 		<!-- Apache Commons -->
@@ -143,6 +142,13 @@
 			<name>Github Packages</name>
 			<url>https://maven.pkg.github.com/javierolmo/melodia-core</url>
 		</repository>
+		<!--
+		<repository>
+			<id>maven</id>
+			<name>Maven Central</name>
+			<url>https://repo.maven.apache.org/maven2/</url>
+		</repository>
+		-->
 	</repositories>
 
 </project>

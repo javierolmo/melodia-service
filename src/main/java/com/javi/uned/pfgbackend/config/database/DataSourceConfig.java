@@ -11,19 +11,19 @@ import javax.sql.DataSource;
 public class DataSourceConfig {
 
     // Host
-    @Value("${DB_HOST:192.168.0.145}")
+    @Value("${DB_HOST:melodiasqlserver.database.windows.net}")
     private String dbHost;
 
     // Port
-    @Value("${DB_PORT:3307}")
+    @Value("${DB_PORT:1433}")
     private String dbPort;
 
     // Database user
-    @Value("${DB_USER:pfg}")
+    @Value("${DB_USER:melodia}")
     private String dbUser;
 
     // Database password
-    @Value("${DB_PASS:47921093pP}")
+    @Value("${DB_PASS:47921093mM?}")
     private String dbPass;
 
     // Database schema
@@ -33,8 +33,7 @@ public class DataSourceConfig {
     @Bean
     public DataSource dataSource() {
         DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver");
-        String url = String.format("jdbc:mysql://%s:%s/%s?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true", dbHost, dbPort, dbSchema);
+        String url = String.format("jdbc:sqlserver://%s:%s;database=melodia;user=%s@melodiasqlserver;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;", dbHost, dbPort, dbUser);
         dataSourceBuilder.url(url);
         dataSourceBuilder.username(dbUser);
         dataSourceBuilder.password(dbPass);
