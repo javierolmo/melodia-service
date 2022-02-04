@@ -10,7 +10,7 @@
 	<groupId>com.javi.uned</groupId>
 	<artifactId>melodia-service</artifactId>
 	<version>0.1.6</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 
 	<dependencies>
 
