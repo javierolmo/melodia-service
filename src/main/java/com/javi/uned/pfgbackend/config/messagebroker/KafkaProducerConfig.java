@@ -1,4 +1,4 @@
-package com.javi.uned.pfgbackend.config.kafka;
+package com.javi.uned.pfgbackend.config.messagebroker;
 
 import com.javi.uned.pfgcommons.model.specs.GeneticSpecs;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -16,6 +16,7 @@ import java.util.Map;
 
 @Configuration
 public class KafkaProducerConfig {
+
 
     @Value("${KAFKA_HOST:localhost}")
     private String kafkaHost;

@@ -1,6 +1,5 @@
 package com.javi.uned.pfgbackend.adapters.api.composer.neuralnetwork;
 
-import com.javi.uned.pfgbackend.adapters.messagebroker.KafkaService;
 import com.javi.uned.pfgbackend.domain.exceptions.MelodiaIOException;
 import com.javi.uned.pfgbackend.domain.ports.messagebroker.MessageBrokerNeuralComposer;
 import io.swagger.annotations.Api;

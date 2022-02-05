@@ -121,6 +121,13 @@
 			<version>3.0.0</version>
 		</dependency>
 
+		<!-- Microsoft Azure PubSub -->
+		<dependency>
+			<groupId>com.azure</groupId>
+			<artifactId>azure-messaging-webpubsub</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

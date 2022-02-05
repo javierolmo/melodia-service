@@ -1,4 +1,4 @@
-package com.javi.uned.pfgbackend.adapters.messagebroker;
+package com.javi.uned.pfgbackend.adapters.kafka;
 
 import com.javi.uned.pfgbackend.adapters.filesystem.FileServiceImpl;
 import com.javi.uned.pfgbackend.domain.exceptions.MelodiaIOException;
@@ -44,4 +44,5 @@ public class KafkaGeneticComposer implements MessageBrokerGeneticComposer {
             throw new MelodiaIOException("Could not read xml file '" + xml.getAbsolutePath() + "'");
         }
     }
+
 }

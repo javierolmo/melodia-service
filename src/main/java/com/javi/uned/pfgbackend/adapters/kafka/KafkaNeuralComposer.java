@@ -1,8 +1,7 @@
-package com.javi.uned.pfgbackend.adapters.messagebroker;
+package com.javi.uned.pfgbackend.adapters.kafka;
 
 import com.javi.uned.pfgbackend.domain.exceptions.MelodiaIOException;
 import com.javi.uned.pfgbackend.domain.ports.messagebroker.MessageBrokerNeuralComposer;
-import io.swagger.v3.oas.annotations.servers.Server;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -24,4 +23,5 @@ public class KafkaNeuralComposer implements MessageBrokerNeuralComposer {
             throw new MelodiaIOException("Could not read xml file '" + file.getName() + "'");
         }
     }
+
 }
