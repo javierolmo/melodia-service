@@ -46,6 +46,10 @@ jobs:
           name: melodia-service
           path: target/melodia-service.jar
 
+      - name: Set Release version env variable
+        run: echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
@@ -57,4 +61,11 @@ jobs:
         with:
           context: .
           push: true
-          tags: javiolmo/pfg-backend:latest
+          tags: javiolmo/melodia-service:latest
+
+      - name: Push to Docker Hub
+          uses: docker/build-push-action@v2
+          with:
+            context: .
+            push: true
+            tags: javiolmo/melodia-service:${{ env.RELEASE_VERSION }}
