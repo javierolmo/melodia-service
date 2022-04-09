@@ -19,5 +19,9 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
+      - uses: s4u/maven-settings-action@v2.4.0
+        with:
+          servers: '[{"id": "github", "username": "javierolmo", "password": "${{ secrets.GITHUB_TOKEN }}"}]'
+
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots verify
