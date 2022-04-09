@@ -1,10 +1,11 @@
 name: Sonar Cloud Analysis
 
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+  workflow_run:
+    workflows: ["Tests"]
+    branches: [master]
+    types:
+      - completed
 
 jobs:
 
