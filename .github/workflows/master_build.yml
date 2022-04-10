@@ -45,7 +45,11 @@ jobs:
         uses: actions/download-artifact@v3.0.0
         with:
           name: melodia-service
-          path: target/melodia-service.jar
+          path: target/melodia-service.zip
+
+      - uses: montudor/action-zip@v1
+        with:
+          args: unzip -qq melodia-service.zip -d melodia-service.jar
 
       - name: Set Release version env variable
         run: echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
