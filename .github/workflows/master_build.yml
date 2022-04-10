@@ -45,7 +45,7 @@ jobs:
         uses: actions/download-artifact@v3.0.0
         with:
           name: melodia-service
-          path: target/melodia-service.zip
+          path: melodia-service.zip
 
       - uses: montudor/action-zip@v1
         with:
