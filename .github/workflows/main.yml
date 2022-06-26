@@ -48,6 +48,10 @@ jobs:
           distribution: ${{ env.DISTRIBUTION }}
           cache: 'maven'
 
+      - uses: s4u/maven-settings-action@v2.4.0
+        with:
+          servers: '[{"id": "github", "username": "javierolmo", "password": "${{ secrets.MELODIA_CORE_TOKEN }}"}]'
+
       - name: Build with Maven
         run: mvn clean install
 
