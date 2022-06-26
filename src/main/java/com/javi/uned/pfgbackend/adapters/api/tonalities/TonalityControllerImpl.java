@@ -1,9 +1,9 @@
 package com.javi.uned.pfgbackend.adapters.api.tonalities;
 
+import com.javi.uned.melodiacore.model.Tonalidad;
+import com.javi.uned.melodiacore.model.constants.Tonalidades;
 import com.javi.uned.pfgbackend.adapters.api.tonalities.model.TonalityDTO;
 import com.javi.uned.pfgbackend.adapters.api.tonalities.model.TonalityDTOTransformer;
-import com.javi.uned.pfgcommons.model.Tonalidad;
-import com.javi.uned.pfgcommons.model.constants.Tonalidades;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;

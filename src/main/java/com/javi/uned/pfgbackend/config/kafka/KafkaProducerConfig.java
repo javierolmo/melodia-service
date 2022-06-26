@@ -1,6 +1,6 @@
 package com.javi.uned.pfgbackend.config.kafka;
 
-import com.javi.uned.pfgcommons.model.specs.GeneticSpecs;
+import com.javi.uned.melodiacore.model.specs.ScoreSpecs;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -23,7 +23,7 @@ public class KafkaProducerConfig {
     private String kafkaPort;
 
     @Bean
-    public ProducerFactory<String, GeneticSpecs> scoreProducerFactory() {
+    public ProducerFactory<String, ScoreSpecs> scoreProducerFactory() {
         Map<String, Object> config = new HashMap<>();
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaHost+":"+kafkaPort);
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -41,7 +41,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, GeneticSpecs> kafkaSpecsTemplate() {
+    public KafkaTemplate<String, ScoreSpecs> kafkaSpecsTemplate() {
         return new KafkaTemplate<>(scoreProducerFactory());
     }
 

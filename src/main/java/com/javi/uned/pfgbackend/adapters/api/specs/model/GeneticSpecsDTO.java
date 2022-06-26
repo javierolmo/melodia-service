@@ -1,16 +1,17 @@
 package com.javi.uned.pfgbackend.adapters.api.specs.model;
 
+import com.javi.uned.melodiacore.model.Compas;
+import com.javi.uned.melodiacore.model.Figura;
+import com.javi.uned.melodiacore.model.Instrumento;
 import com.javi.uned.pfgbackend.adapters.api.tonalities.model.TonalityDTO;
-import com.javi.uned.pfgcommons.model.Compas;
-import com.javi.uned.pfgcommons.model.Figura;
-import com.javi.uned.pfgcommons.model.Instrumento;
-import com.javi.uned.pfgcommons.model.Tonalidad;
+
+import java.util.List;
 
 public class GeneticSpecsDTO {
     private int requesterId;
     private String movementTitle;
     private String movementNumber;
-    private String[] authors;
+    private List<String> authors;
     private int measures;
     private Compas compas;
     private Instrumento[] instrumentos;
@@ -43,11 +44,11 @@ public class GeneticSpecsDTO {
         this.movementNumber = movementNumber;
     }
 
-    public String[] getAuthors() {
+    public List<String> getAuthors() {
         return authors;
     }
 
-    public void setAuthors(String[] authors) {
+    public void setAuthors(List<String> authors) {
         this.authors = authors;
     }
 

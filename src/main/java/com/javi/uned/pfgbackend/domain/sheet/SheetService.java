@@ -1,16 +1,14 @@
 package com.javi.uned.pfgbackend.domain.sheet;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.javi.uned.pfgbackend.adapters.api.sheets.model.SheetDTO;
-import com.javi.uned.pfgbackend.adapters.api.sheets.model.SheetDTOTransformer;
-import com.javi.uned.pfgbackend.adapters.filesystem.FileServiceImpl;
-import com.javi.uned.pfgbackend.domain.enums.Formats;
+import com.javi.uned.melodiacore.model.specs.ScoreSpecs;
 import com.javi.uned.pfgbackend.domain.exceptions.*;
+import com.javi.uned.pfgbackend.domain.ports.database.RequestDAO;
 import com.javi.uned.pfgbackend.domain.ports.database.SheetDAO;
 import com.javi.uned.pfgbackend.domain.ports.filesystem.FileFormat;
+import com.javi.uned.pfgbackend.domain.ports.filesystem.FileSystem;
 import com.javi.uned.pfgbackend.domain.ports.messagebroker.MessageBrokerGeneticComposer;
+import com.javi.uned.pfgbackend.domain.sheet.model.Request;
 import com.javi.uned.pfgbackend.domain.sheet.model.Sheet;
-import com.javi.uned.pfgcommons.model.specs.GeneticSpecs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -33,9 +27,11 @@ public class SheetService {
     @Autowired
     private SheetDAO sheetDAO;
     @Autowired
-    private FileServiceImpl fileServiceImpl;
+    private RequestDAO requestDAO;
     @Autowired
-    private KafkaTemplate<String, GeneticSpecs> retryXmlTemplate;
+    private FileSystem fileSystem;
+    @Autowired
+    private KafkaTemplate<String, ScoreSpecs> retryXmlTemplate;
     @Autowired
     private MessageBrokerGeneticComposer messageBrokerGeneticComposer;
 
@@ -49,18 +45,19 @@ public class SheetService {
 
     public void delete(int id) {
         sheetDAO.deleteById(id);
-        fileServiceImpl.deleteSheetFolder(id);
+        fileSystem.deleteSheetFolder(id);
     }
 
-    public void retry(int id) throws RetryException {
 
+    public void retry(int id) throws RetryException {
+        /* TODO: Implementar
         try {
-            File specsFile = new File(fileServiceImpl.getSheetFolder(id), "specs.json");
+            File specsFile = new File(fileSystem.getSheetFolder(id), "specs.json");
             Sheet sheet = sheetDAO.findById(id);
 
             if (specsFile.exists()) {
-                File xml = new File(fileServiceImpl.getSheetFolder(id), id + Formats.MUSICXML);
-                File pdf = new File(fileServiceImpl.getSheetFolder(id), id + Formats.PDF);
+                File xml = new File(fileSystem.getSheetFolder(id), id + Formats.MUSICXML);
+                File pdf = new File(fileSystem.getSheetFolder(id), id + Formats.PDF);
 
                 if (xml.exists() && pdf.exists()) {
                     throw new RetryException("Omitido el reintento. Ya existen el xml y el pdf");
@@ -88,7 +85,11 @@ public class SheetService {
         } catch (EntityNotFound entityNotFound) {
             //TODO:
         }
+
+     */
     }
+
+
 
     public Page<Sheet> getSheetPage(PageRequest pageRequest, String name) {
         return sheetDAO.getSheetPage(pageRequest, name);
@@ -102,69 +103,39 @@ public class SheetService {
         return this.sheetDAO.findById(id);
     }
 
-    public File pdfFile(long id) throws FileNotFoundException {
-        File file = new File(fileServiceImpl.getSheetFolder(id), id + Formats.PDF);
-
-        if (!file.exists()) {
-            throw new FileNotFoundException("PDF file not found");
-        }
-
-        return file;
-    }
-
-    public File xmlFile(long id) throws FileNotFoundException {
-        File file = new File(fileServiceImpl.getSheetFolder(id), id + Formats.MUSICXML);
-
-        if (!file.exists()) {
-            throw new FileNotFoundException("PDF file not found");
-        }
-
-        return file;
-    }
-
-    public File specsFile(long id) throws FileNotFoundException {
-        File file = new File(fileServiceImpl.getSheetFolder(id), String.format("%d.json", id));
-
-        if (!file.exists()) {
-            throw new FileNotFoundException("Specs file not found");
-        }
-
-        return file;
-    }
-
-    public void uploadSpecs(long id, InputStream inputStream) throws EntityNotFound, FileServiceException {
+    public void uploadSpecs(long id, InputStream inputStream) throws EntityNotFound, MelodiaFileSystemException {
 
         // Find sheet
         Sheet sheet = findById(id);
 
         // Save sheet in filesystem
-        String path = fileServiceImpl.saveSheetFile(id, inputStream, FileFormat.JSON);
+        String path = fileSystem.saveSheetFile(id, inputStream, FileFormat.JSON);
 
         // Update specs path
         sheetDAO.updateSpecsPath(id, path);
 
     }
 
-    public void uploadXml(long id, InputStream inputStream) throws EntityNotFound, FileServiceException {
+    public void uploadXml(long id, InputStream inputStream) throws EntityNotFound, MelodiaFileSystemException {
 
         // Find sheet
         Sheet sheet = findById(id);
 
         // Save sheet in filesystem
-        String path = fileServiceImpl.saveSheetFile(id, inputStream, FileFormat.MUSICXML);
+        String path = fileSystem.saveSheetFile(id, inputStream, FileFormat.MUSICXML);
 
         // Update specs path
         sheetDAO.updateXMLPath(id, path);
 
     }
 
-    public void uploadPdf(long id, InputStream inputStream) throws EntityNotFound, FileServiceException {
+    public void uploadPdf(long id, InputStream inputStream) throws EntityNotFound, MelodiaFileSystemException {
 
         // Find sheet
         Sheet sheet = findById(id);
 
         // Save sheet in filesystem
-        String path = fileServiceImpl.saveSheetFile(id, inputStream, FileFormat.PDF);
+        String path = fileSystem.saveSheetFile(id, inputStream, FileFormat.PDF);
 
         // Update specs path
         sheet = sheetDAO.updatePDFPath(id, path);
@@ -183,7 +154,10 @@ public class SheetService {
         if(finished != sheet.getFinished()) {
             sheetDAO.setFinished(sheet.getId(), finished);
         }
-
-
     }
+
+    public Request submitSheetRequest(Request request) {
+        return requestDAO.save(request);
+    }
+
 }

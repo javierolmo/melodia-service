@@ -3,16 +3,17 @@ package com.javi.uned.pfgbackend.adapters.api.sheets;
 import com.javi.uned.pfgbackend.adapters.api.RestException;
 import com.javi.uned.pfgbackend.adapters.api.sheets.model.SheetDTO;
 import com.javi.uned.pfgbackend.adapters.api.sheets.model.SheetDTOTransformer;
-import com.javi.uned.pfgbackend.adapters.filesystem.FileServiceImpl;
 import com.javi.uned.pfgbackend.domain.enums.Formats;
 import com.javi.uned.pfgbackend.domain.exceptions.EntityNotFound;
-import com.javi.uned.pfgbackend.domain.exceptions.FileServiceException;
+import com.javi.uned.pfgbackend.domain.exceptions.MelodiaFileSystemException;
 import com.javi.uned.pfgbackend.domain.exceptions.RetryException;
 import com.javi.uned.pfgbackend.domain.ports.filesystem.FileFormat;
+import com.javi.uned.pfgbackend.domain.ports.filesystem.FileSystem;
 import com.javi.uned.pfgbackend.domain.sheet.SheetService;
 import com.javi.uned.pfgbackend.domain.sheet.model.Sheet;
 import io.swagger.annotations.Api;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +28,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,11 +38,13 @@ import java.util.stream.Collectors;
 @Api(tags = "Sheets")
 public class SheetControllerImpl implements SheetController {
 
+    private Logger logger = LoggerFactory.getLogger(SheetControllerImpl.class);
+
     @Autowired
     private SheetService sheetService;
     @Autowired
-    private FileServiceImpl fileServiceImpl;
-    private Logger logger = LoggerFactory.getLogger(SheetControllerImpl.class);
+    private FileSystem fileSystem;
+
 
     public Page<SheetDTO> getSheets(int page, int size, String text) {
 
@@ -87,7 +87,7 @@ public class SheetControllerImpl implements SheetController {
     }
 
     @Override
-    public String uploadFile(long id, String format, MultipartFile multipartFile) throws EntityNotFound, IOException, FileServiceException {
+    public String uploadFile(long id, String format, MultipartFile multipartFile) throws EntityNotFound, IOException, MelodiaFileSystemException {
 
         // Parse format
         FileFormat fileFormat = FileFormat.valueOf(format.toUpperCase());
@@ -112,18 +112,21 @@ public class SheetControllerImpl implements SheetController {
     public ResponseEntity visualizePDF(int id) {
 
         try {
-            // File
-            File file = sheetService.pdfFile(id);
-            byte[] bytes = FileUtils.readFileToByteArray(file);
+            // Get sheet data
+            Sheet sheet = sheetService.getSheet(id);
+
+            // Read file from fileSystem to byte array
+            InputStream inputStream = fileSystem.readFile(id, FileFormat.PDF);
+            byte[] bytes = IOUtils.toByteArray(inputStream);
 
             // Headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + file.getName());
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + sheet.getName());
             headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
 
             return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
-        } catch (IOException e) {
+        } catch (IOException | MelodiaFileSystemException | EntityNotFound e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error trying to read pdf");
         }
     }
@@ -131,18 +134,20 @@ public class SheetControllerImpl implements SheetController {
     public ResponseEntity visualizeXML(int id) {
 
         try {
-            // File
-            File file = sheetService.xmlFile(id);
-            byte[] bytes = FileUtils.readFileToByteArray(file);
+            // Get sheet data
+            Sheet sheet = sheetService.getSheet(id);
+
+            // Read file from fileSystem to byte array
+            InputStream inputStream = fileSystem.readFile(id, FileFormat.MUSICXML);
+            byte[] bytes = IOUtils.toByteArray(inputStream);
 
             // Headers
             HttpHeaders headers = new HttpHeaders();
-            //headers.setContentType(MediaType.APPLICATION_XML); Creo que no haría falta esto
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + file.getName());
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + sheet.getName());
             headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
 
             return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
-        } catch (IOException e) {
+        } catch (IOException | EntityNotFound | MelodiaFileSystemException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error trying to read musicxml");
         }
 
@@ -151,18 +156,21 @@ public class SheetControllerImpl implements SheetController {
 
     public ResponseEntity visualizeSpecs(int id) {
         try {
-            // File
-            File file = sheetService.specsFile(id);
-            byte[] bytes = FileUtils.readFileToByteArray(file);
+            // Get sheet data
+            Sheet sheet = sheetService.getSheet(id);
+
+            // Read file from fileSystem to byte array
+            InputStream inputStream = fileSystem.readFile(id, FileFormat.JSON);
+            byte[] bytes = IOUtils.toByteArray(inputStream);
 
             // Headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + file.getName());
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + sheet.getName());
             headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
 
             return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
-        } catch (IOException e) {
+        } catch (IOException | EntityNotFound | MelodiaFileSystemException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
@@ -178,35 +186,49 @@ public class SheetControllerImpl implements SheetController {
 
     public ResponseEntity downloadFileXML(int id) {
         try {
+            // Get sheet data
             Sheet sheet = sheetService.getSheet(id);
-            File file = sheetService.xmlFile(id);
-            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+            // Read file from fileSystem to byte array
+            InputStream inputStream = fileSystem.readFile(id, FileFormat.MUSICXML);
+            InputStreamResource resource = new InputStreamResource(inputStream);
+
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sheet.getName() + Formats.MUSICXML + "\"")
-                    .contentLength(file.length())
-                    //.contentType(MediaType.APPLICATION_OCTET_STREAM) creo que ya no hace falta, lo puse por anotación en la interfaz...
+                    .contentLength(inputStream.available())
                     .body(resource);
         } catch (EntityNotFound enf) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(enf.getMessage());
         } catch (FileNotFoundException fnf) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Could not find file in system storage");
+        } catch (MelodiaFileSystemException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error trying to read musicxml");
         }
     }
 
     public ResponseEntity downloadFilePDF(int id) {
         try {
+            // Get sheet data
             Sheet sheet = sheetService.getSheet(id);
-            File file = sheetService.pdfFile(id);
-            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+            // Read file from fileSystem to byte array
+            InputStream inputStream = fileSystem.readFile(id, FileFormat.PDF);
+            InputStreamResource resource = new InputStreamResource(inputStream);
+
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sheet.getName() + Formats.PDF + "\"")
-                    .contentLength(file.length())
-                    //.contentType(MediaType.APPLICATION_OCTET_STREAM) creo que ya no hace falta, lo puse por anotación en la interfaz...
+                    .contentLength(inputStream.available())
                     .body(resource);
         } catch (EntityNotFound enf) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(enf.getMessage());
         } catch (FileNotFoundException fnf) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Could not find file in system storage");
+        } catch (MelodiaFileSystemException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 }

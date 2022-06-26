@@ -1,12 +1,12 @@
 package com.javi.uned.pfgbackend.adapters.api.specs.model;
 
+import com.javi.uned.melodiacore.model.specs.ScoreSpecs;
 import com.javi.uned.pfgbackend.adapters.api.tonalities.model.TonalityDTOTransformer;
-import com.javi.uned.pfgcommons.model.specs.GeneticSpecs;
 
 public class GeneticSpecsDTOTransformer {
 
-    public static GeneticSpecs toDomainObject(GeneticSpecsDTO geneticSpecsDTO) {
-        GeneticSpecs geneticSpecs = new GeneticSpecs();
+    public static ScoreSpecs toDomainObject(GeneticSpecsDTO geneticSpecsDTO) {
+        ScoreSpecs geneticSpecs = new ScoreSpecs();
         geneticSpecs.setRequesterId(geneticSpecsDTO.getRequesterId());
         geneticSpecs.setMovementTitle(geneticSpecsDTO.getMovementTitle());
         geneticSpecs.setMovementNumber(geneticSpecsDTO.getMovementNumber());
@@ -21,19 +21,19 @@ public class GeneticSpecsDTOTransformer {
         return geneticSpecs;
     }
 
-    public static GeneticSpecsDTO toTransferObject(GeneticSpecs geneticSpecs) {
+    public static GeneticSpecsDTO toTransferObject(ScoreSpecs scoreSpecs) {
         GeneticSpecsDTO geneticSpecsDTO = new GeneticSpecsDTO();
-        geneticSpecsDTO.setRequesterId(geneticSpecs.getRequesterId());
-        geneticSpecsDTO.setMovementTitle(geneticSpecs.getMovementTitle());
-        geneticSpecsDTO.setMovementNumber(geneticSpecs.getMovementNumber());
-        geneticSpecsDTO.setAuthors(geneticSpecs.getAuthors());
-        geneticSpecsDTO.setMeasures(geneticSpecs.getMeasures());
-        geneticSpecsDTO.setCompas(geneticSpecs.getCompas());
-        geneticSpecsDTO.setInstrumentos(geneticSpecs.getInstrumentos());
-        geneticSpecsDTO.setTonalidad(TonalityDTOTransformer.toTransferObject(geneticSpecs.getTonalidad()));
-        geneticSpecsDTO.setPhraseLength(geneticSpecs.getPhraseLength());
-        geneticSpecsDTO.setMinFigura(geneticSpecs.getMinFigura());
-        geneticSpecsDTO.setMaxFigura(geneticSpecs.getMaxFigura());
+        geneticSpecsDTO.setRequesterId(scoreSpecs.getRequesterId());
+        geneticSpecsDTO.setMovementTitle(scoreSpecs.getMovementTitle());
+        geneticSpecsDTO.setMovementNumber(scoreSpecs.getMovementNumber());
+        geneticSpecsDTO.setAuthors(scoreSpecs.getAuthors());
+        geneticSpecsDTO.setMeasures(scoreSpecs.getMeasures());
+        geneticSpecsDTO.setCompas(scoreSpecs.getCompas());
+        geneticSpecsDTO.setInstrumentos(scoreSpecs.getInstrumentos());
+        geneticSpecsDTO.setTonalidad(TonalityDTOTransformer.toTransferObject(scoreSpecs.getTonalidad()));
+        geneticSpecsDTO.setPhraseLength(scoreSpecs.getPhraseLength());
+        geneticSpecsDTO.setMinFigura(scoreSpecs.getMinFigura());
+        geneticSpecsDTO.setMaxFigura(scoreSpecs.getMaxFigura());
         return geneticSpecsDTO;
     }
 

@@ -10,34 +10,15 @@ import javax.sql.DataSource;
 @Configuration
 public class DataSourceConfig {
 
-    // Host
-    @Value("${DB_HOST:192.168.0.145}")
-    private String dbHost;
-
-    // Port
-    @Value("${DB_PORT:3307}")
-    private String dbPort;
-
-    // Database user
-    @Value("${DB_USER:pfg}")
-    private String dbUser;
-
-    // Database password
-    @Value("${DB_PASS:47921093pP}")
-    private String dbPass;
-
-    // Database schema
-    @Value("${DB_SCHEMA:melodia}")
-    private String dbSchema;
+    // Connection String
+    @Value("${DATABASE_CONNECTION_STRING:jdbc:sqlserver://melodiasqlserver.database.windows.net:1433;database=melodia;user=melodia@melodiasqlserver;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;}")
+    private String connectionString;
 
     @Bean
     public DataSource dataSource() {
         DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver");
-        String url = String.format("jdbc:mysql://%s:%s/%s?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true", dbHost, dbPort, dbSchema);
-        dataSourceBuilder.url(url);
-        dataSourceBuilder.username(dbUser);
-        dataSourceBuilder.password(dbPass);
+        dataSourceBuilder.url(connectionString);
+        dataSourceBuilder.password("47921093mM?");
         return dataSourceBuilder.build();
     }
 

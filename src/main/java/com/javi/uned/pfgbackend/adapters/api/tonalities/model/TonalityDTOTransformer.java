@@ -1,7 +1,7 @@
 package com.javi.uned.pfgbackend.adapters.api.tonalities.model;
 
-import com.javi.uned.pfgcommons.model.Tonalidad;
-import com.javi.uned.pfgcommons.model.constants.Tonalidades;
+import com.javi.uned.melodiacore.model.Tonalidad;
+import com.javi.uned.melodiacore.model.constants.Tonalidades;
 
 public class TonalityDTOTransformer {
 

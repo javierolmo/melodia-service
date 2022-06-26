@@ -39,6 +39,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
         // Declare users
         User javi = new User(null, "jolmo60@alumno.uned.es", "1234", "Javier", "Olmo Injerto", true, Arrays.asList(adminRole));
+        User elena = new User(null, "leni102@hotmail.com", "1234", "Elena", "Santiago", true, Arrays.asList(userRole));
         User tester = new User(null, "tester@gmail.com", "1234", "Tester", "Appelido1 Apellido2", true, Arrays.asList(testerRole));
         User joseManuel = new User(null, "jmcuadra@dia.uned.es", "1234", "Jose Manuel", "Cuadra Troncoso", true, Arrays.asList(userRole));
         User[] users = new User[]{javi, tester, joseManuel};

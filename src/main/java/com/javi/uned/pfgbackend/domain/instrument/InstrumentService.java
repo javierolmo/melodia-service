@@ -1,7 +1,7 @@
 package com.javi.uned.pfgbackend.domain.instrument;
 
-import com.javi.uned.pfgcommons.model.Instrumento;
-import com.javi.uned.pfgcommons.model.constants.Instrumentos;
+import com.javi.uned.melodiacore.model.Instrumento;
+import com.javi.uned.melodiacore.model.constants.Instrumentos;
 import org.springframework.stereotype.Service;
 
 @Service

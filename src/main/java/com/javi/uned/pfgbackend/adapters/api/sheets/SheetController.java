@@ -2,7 +2,7 @@ package com.javi.uned.pfgbackend.adapters.api.sheets;
 
 import com.javi.uned.pfgbackend.adapters.api.sheets.model.SheetDTO;
 import com.javi.uned.pfgbackend.domain.exceptions.EntityNotFound;
-import com.javi.uned.pfgbackend.domain.exceptions.FileServiceException;
+import com.javi.uned.pfgbackend.domain.exceptions.MelodiaFileSystemException;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -80,7 +80,7 @@ public interface SheetController {
             @PathVariable long id,
             @PathVariable String format,
             @RequestParam("file") MultipartFile multipartFile
-    ) throws IOException, EntityNotFound, FileServiceException;
+    ) throws IOException, EntityNotFound, MelodiaFileSystemException;
 
     /**
      * Permite visualizar una partitura en pdf

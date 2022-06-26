@@ -105,7 +105,7 @@
 		<dependency>
 			<groupId>com.javi.uned</groupId>
 			<artifactId>melodia-core</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.2</version>
 		</dependency>
 
 		<!-- Swagger -->
@@ -122,6 +122,28 @@
 			<version>4.4.0</version>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- Azure Storage -->
+		<dependency>
+			<groupId>com.microsoft.azure</groupId>
+			<artifactId>azure-storage</artifactId>
+			<version>8.6.6</version>
+		</dependency>
+
+		<!-- SQLServer JDBC -->
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>7.4.1.jre8</version>
+		</dependency>
+
+		<!-- Apache HTTP Client -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.13</version>
+		</dependency>
+
 
 	</dependencies>
 

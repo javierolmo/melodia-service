@@ -53,4 +53,18 @@ public class Sheet {
     public String getPdfPath() {
         return pdfPath;
     }
+
+    @Override
+    public String toString() {
+        return "Sheet{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", date='" + date + '\'' +
+                ", ownerId=" + ownerId +
+                ", finished=" + finished +
+                ", specsPath='" + specsPath + '\'' +
+                ", xmlPath='" + xmlPath + '\'' +
+                ", pdfPath='" + pdfPath + '\'' +
+                '}';
+    }
 }

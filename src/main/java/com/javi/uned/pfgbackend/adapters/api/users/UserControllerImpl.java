@@ -1,42 +1,28 @@
 package com.javi.uned.pfgbackend.adapters.api.users;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javi.uned.pfgbackend.adapters.api.users.model.NewPasswordRequest;
 import com.javi.uned.pfgbackend.adapters.api.users.model.TokenResponse;
 import com.javi.uned.pfgbackend.adapters.api.users.model.UserDTO;
 import com.javi.uned.pfgbackend.adapters.api.users.model.UserDTOTransformer;
-import com.javi.uned.pfgbackend.adapters.filesystem.FileServiceImpl;
 import com.javi.uned.pfgbackend.config.JWTAuthorizationFilter;
 import com.javi.uned.pfgbackend.domain.exceptions.AuthException;
 import com.javi.uned.pfgbackend.domain.exceptions.EntityNotFound;
 import com.javi.uned.pfgbackend.domain.instrument.InstrumentService;
+import com.javi.uned.pfgbackend.domain.ports.filesystem.FileSystem;
 import com.javi.uned.pfgbackend.domain.ports.messagebroker.MessageBrokerGeneticComposer;
 import com.javi.uned.pfgbackend.domain.sheet.SheetService;
-import com.javi.uned.pfgbackend.domain.sheet.model.Sheet;
 import com.javi.uned.pfgbackend.domain.user.CustomUserDetailsService;
 import com.javi.uned.pfgbackend.domain.user.UserService;
 import com.javi.uned.pfgbackend.domain.user.model.User;
-import com.javi.uned.pfgcommons.model.Instrumento;
-import com.javi.uned.pfgcommons.model.specs.GeneticSpecs;
 import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,18 +32,9 @@ import java.util.stream.Collectors;
 public class UserControllerImpl implements UserController {
 
     private final Logger logger = LoggerFactory.getLogger(UserControllerImpl.class);
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
-    @Autowired
-    private SheetService sheetService;
-    @Autowired
-    private InstrumentService instrumentService;
-    @Autowired
-    private FileServiceImpl fileServiceImpl;
+
     @Autowired
     private UserService userService;
-    @Autowired
-    private MessageBrokerGeneticComposer messageBrokerGeneticComposer;
 
     @Override
     public List<UserDTO> getUsers() {
@@ -125,7 +102,7 @@ public class UserControllerImpl implements UserController {
 
     @Override
     public UserDTO resetPassword(String token, NewPasswordRequest newPasswordRequest) {
-        //TODO:
+        //TODO: Reset password
         return null;
     }
 
