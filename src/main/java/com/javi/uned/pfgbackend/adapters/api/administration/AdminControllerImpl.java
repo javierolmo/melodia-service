@@ -24,8 +24,7 @@ public class AdminControllerImpl implements AdminController {
     public Page<LogEntity> getLogs(int size, int index, boolean ascendent) throws RestException {
         Sort sort = Sort.by(ascendent ? Sort.Direction.ASC : Sort.Direction.DESC, "id");
         PageRequest pageRequest = PageRequest.of(index, size, sort);
-        Page<LogEntity> logPage = logRepository.findAll(pageRequest);
-        return logPage;
+        return logRepository.findAll(pageRequest);
     }
 
 }

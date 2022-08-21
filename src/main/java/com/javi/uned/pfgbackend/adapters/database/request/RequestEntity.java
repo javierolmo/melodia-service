@@ -1,5 +1,7 @@
 package com.javi.uned.pfgbackend.adapters.database.request;
 
+import com.javi.uned.pfgbackend.domain.sheet.model.Request;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -13,13 +15,17 @@ public class RequestEntity {
     @Column(name = "user_id")
     private Long userId;
     @Column(name = "start_date_time")
-    private LocalDateTime startDateTime;
+    private String startDateTime;
     @Column(name = "end_date_time")
-    private LocalDateTime endDateTime;
+    private String endDateTime;
     @Column(name = "azf_code")
     private String azfCode;
     @Column(name = "specs", length = 5000)
     private String specs;
+    @Column(name = "status")
+    private String status;
+    @Column(name = "sheet_id")
+    private Long sheetId;
 
     public Long getId() {
         return id;
@@ -37,19 +43,19 @@ public class RequestEntity {
         this.userId = userId;
     }
 
-    public LocalDateTime getStartDateTime() {
+    public String getStartDateTime() {
         return startDateTime;
     }
 
-    public void setStartDateTime(LocalDateTime startDateTime) {
+    public void setStartDateTime(String startDateTime) {
         this.startDateTime = startDateTime;
     }
 
-    public LocalDateTime getEndDateTime() {
+    public String getEndDateTime() {
         return endDateTime;
     }
 
-    public void setEndDateTime(LocalDateTime endDateTime) {
+    public void setEndDateTime(String endDateTime) {
         this.endDateTime = endDateTime;
     }
 
@@ -67,5 +73,34 @@ public class RequestEntity {
 
     public void setSpecs(String specs) {
         this.specs = specs;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Long getSheetId() {
+        return sheetId;
+    }
+
+    public void setSheetId(Long sheetId) {
+        this.sheetId = sheetId;
+    }
+
+    public Request toRequest() {
+        Request request = new Request();
+        request.setId(id);
+        request.setUserId(userId);
+        request.setStartDateTime(startDateTime);
+        request.setEndDateTime(endDateTime);
+        request.setAzfCode(azfCode);
+        request.setSpecs(specs);
+        request.setStatus(status);
+        request.setSheetId(sheetId);
+        return request;
     }
 }

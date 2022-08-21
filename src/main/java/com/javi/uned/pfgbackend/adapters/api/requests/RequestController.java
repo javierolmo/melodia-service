@@ -1,4 +1,4 @@
-package com.javi.uned.pfgbackend.adapters.api.specs;
+package com.javi.uned.pfgbackend.adapters.api.requests;
 
 import com.javi.uned.melodiacore.model.specs.ScoreSpecsDTO;
 import com.javi.uned.pfgbackend.domain.sheet.model.Request;
@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 
-public interface SpecsController {
+public interface RequestController {
 
-    @PostMapping(value = "/api/specs/genetic-specs", produces = MediaType.APPLICATION_JSON_VALUE)
-    Request postGeneticSpecs(@RequestBody ScoreSpecsDTO geneticSpecsDTO) throws IOException;
+    @PostMapping(value = "/api/requests/composition", produces = MediaType.APPLICATION_JSON_VALUE)
+    Request sendCompositionRequest(@RequestBody ScoreSpecsDTO geneticSpecsDTO) throws IOException;
 
-    @GetMapping(value = "/api/specs/genetic-specs/random", produces = MediaType.APPLICATION_JSON_VALUE)
-    ScoreSpecsDTO getRandomGeneticSpecs(
+    @GetMapping(value = "/api/requests/composition/sample-body", produces = MediaType.APPLICATION_JSON_VALUE)
+    ScoreSpecsDTO getRandomSpecs(
             @RequestParam int requesterId);
 
 }

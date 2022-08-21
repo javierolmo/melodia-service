@@ -1,5 +1,10 @@
-package com.javi.uned.pfgbackend.adapters.api.specs;
+package com.javi.uned.pfgbackend.adapters.api.requests;
 
+import com.azure.core.credential.AzureKeyCredential;
+import com.azure.core.util.BinaryData;
+import com.azure.messaging.eventgrid.EventGridEvent;
+import com.azure.messaging.eventgrid.EventGridPublisherClient;
+import com.azure.messaging.eventgrid.EventGridPublisherClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javi.uned.melodiacore.model.Instrumento;
 import com.javi.uned.melodiacore.model.constants.Figuras;
@@ -25,10 +30,10 @@ import java.util.logging.Logger;
 
 @CrossOrigin
 @RestController
-@Api(tags = "Specs")
-public class SpecsControllerImpl implements SpecsController {
+@Api(tags = "Requests")
+public class RequestControllerImpl implements RequestController {
 
-    private static final Logger logger = Logger.getLogger(SpecsControllerImpl.class.getName());
+    private static final Logger logger = Logger.getLogger(RequestControllerImpl.class.getName());
 
     @Autowired
     private SheetService sheetService;
@@ -40,29 +45,36 @@ public class SpecsControllerImpl implements SpecsController {
     private UtilService utilService;
 
     @Override
-    public Request postGeneticSpecs(ScoreSpecsDTO scoreSpecsDTO) throws IOException {
+    public Request sendCompositionRequest(ScoreSpecsDTO scoreSpecsDTO) throws IOException {
 
         logger.info("POST geneticSpecsDTO: " + scoreSpecsDTO);
 
         // Create request
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(scoreSpecsDTO);
-        Request request = new Request(
-                scoreSpecsDTO.getRequesterId(),
-                LocalDateTime.now(),
-                null,
-                null,
-                json
-        );
+        Request request = new Request();
+        request.setUserId(Long.valueOf(scoreSpecsDTO.getRequesterId()));
+        request.setStartDateTime(LocalDateTime.now().toString());
+        request.setSpecs(json);
+        request.setStatus("PENDING");
 
         // Save request in database
         request = sheetService.submitSheetRequest(request);
+
+        // Send request to message broker
+        AzureKeyCredential key = new AzureKeyCredential("d8OTHzjPGDrE9Y31AoaviizxCUkFGr7Qftn0eTg3dxQ=");
+        EventGridPublisherClient<EventGridEvent> ege = new EventGridPublisherClientBuilder()
+                .endpoint("https://specs.eastus2-1.eventgrid.azure.net/api/events")
+                .credential(key)
+                .buildEventGridEventPublisherClient();
+        EventGridEvent event = new EventGridEvent("melodia","composition-request",BinaryData.fromObject(request),"1.0");
+        ege.sendEvent(event);
 
         return request;
     }
 
     @Override
-    public ScoreSpecsDTO getRandomGeneticSpecs(int requesterId) {
+    public ScoreSpecsDTO getRandomSpecs(int requesterId) {
         MelodiaRandom melodiaRandom = new MelodiaRandom(); //TODO: Add method randomSpecs() to MelodiaRandom
         ScoreSpecs scoreSpecs = new ScoreSpecs();
         scoreSpecs.setRequesterId(requesterId);

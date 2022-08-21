@@ -26,18 +26,16 @@ public class RequestDAOImpl implements RequestDAO {
 
     @Override
     public Request save(Request request) {
-        RequestEntity requestEntity = RequestEntityTransformer.toEntity(request);
-        return RequestEntityTransformer.toDomainObject(requestRepository.save(requestEntity));
+        RequestEntity requestEntity = request.toEntity();
+        requestEntity = requestRepository.save(requestEntity);
+        return requestEntity.toRequest();
     }
 
     @Override
     public Request findById(long id) throws EntityNotFound {
-        Optional<RequestEntity> requestEntity = requestRepository.findById(id);
-        if (requestEntity.isPresent()) {
-            return RequestEntityTransformer.toDomainObject(requestEntity.get());
-        } else {
-            throw new EntityNotFound("Request with id " + id + " not found");
-        }
+        RequestEntity requestEntity = requestRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFound("Request with id " + id + " not found"));
+        return requestEntity.toRequest();
     }
 
     @Override
@@ -53,7 +51,7 @@ public class RequestDAOImpl implements RequestDAO {
     @Override
     public List<Request> findAll() {
         return requestRepository.findAll().stream()
-                .map(RequestEntityTransformer::toDomainObject)
+                .map(RequestEntity::toRequest)
                 .collect(Collectors.toList());
     }
 }
