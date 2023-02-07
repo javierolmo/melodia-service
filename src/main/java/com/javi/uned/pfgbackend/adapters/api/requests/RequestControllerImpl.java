@@ -12,6 +12,7 @@ import com.javi.uned.melodiacore.model.constants.Instrumentos;
 import com.javi.uned.melodiacore.model.specs.ScoreSpecs;
 import com.javi.uned.melodiacore.model.specs.ScoreSpecsDTO;
 import com.javi.uned.melodiacore.util.MelodiaRandom;
+import com.javi.uned.pfgbackend.adapters.composer.Composer;
 import com.javi.uned.pfgbackend.domain.ports.filesystem.FileSystem;
 import com.javi.uned.pfgbackend.domain.ports.messagebroker.MessageBrokerGeneticComposer;
 import com.javi.uned.pfgbackend.domain.sheet.SheetService;
@@ -19,8 +20,10 @@ import com.javi.uned.pfgbackend.domain.sheet.model.Request;
 import com.javi.uned.pfgbackend.domain.util.UtilService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -43,13 +46,16 @@ public class RequestControllerImpl implements RequestController {
     private MessageBrokerGeneticComposer messageBrokerGeneticComposer;
     @Autowired
     private UtilService utilService;
+    @Autowired
+    private Composer composer;
 
     @Override
-    public Request sendCompositionRequest(ScoreSpecsDTO scoreSpecsDTO) throws IOException {
+    @PostMapping(value = "/api/requests/composition", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Request submitCompositionRequest(@RequestBody ScoreSpecsDTO scoreSpecsDTO) throws IOException {
 
-        logger.info("POST geneticSpecsDTO: " + scoreSpecsDTO);
+        logger.info("POST /api/request/composition. Body:" + scoreSpecsDTO);
 
-        // Create request
+        // Create request and save into database
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(scoreSpecsDTO);
         Request request = new Request();
@@ -57,24 +63,17 @@ public class RequestControllerImpl implements RequestController {
         request.setStartDateTime(LocalDateTime.now().toString());
         request.setSpecs(json);
         request.setStatus("PENDING");
-
-        // Save request in database
         request = sheetService.submitSheetRequest(request);
+        logger.info("Request saved into database with id: " + request.getId());
 
-        // Send request to message broker
-        AzureKeyCredential key = new AzureKeyCredential("d8OTHzjPGDrE9Y31AoaviizxCUkFGr7Qftn0eTg3dxQ=");
-        EventGridPublisherClient<EventGridEvent> ege = new EventGridPublisherClientBuilder()
-                .endpoint("https://specs.eastus2-1.eventgrid.azure.net/api/events")
-                .credential(key)
-                .buildEventGridEventPublisherClient();
-        EventGridEvent event = new EventGridEvent("melodia","composition-request",BinaryData.fromObject(request),"1.0");
-        ege.sendEvent(event);
-
+        // Submit request
+        composer.submitRequest(request);
         return request;
     }
 
     @Override
-    public ScoreSpecsDTO getRandomSpecs(int requesterId) {
+    @GetMapping(value = "/api/requests/composition/sample-body", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ScoreSpecsDTO getRandomSpecs(@RequestParam int requesterId) {
         MelodiaRandom melodiaRandom = new MelodiaRandom(); //TODO: Add method randomSpecs() to MelodiaRandom
         ScoreSpecs scoreSpecs = new ScoreSpecs();
         scoreSpecs.setRequesterId(requesterId);
